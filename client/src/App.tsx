@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import JoinChatForm from "./components/JoinRoomForm";
+import JoinChatRoomsForm from "@/components/JoinChatRoomsForm";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <JoinChatForm />
+          <JoinChatRoomsForm />
         </CardContent>
       </Card>
     </div>
