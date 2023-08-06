@@ -10,6 +10,8 @@ import { Loader } from "lucide-react";
 import socket from "@/sockets";
 import { EVENTS } from "@/sockets/events";
 import { useToast } from "@/components/ui/use-toast";
+import useUserStore from "@/stores/userStore";
+import useMembersStore from "@/stores/membersStore";
 
 const schema = z.object({
   username: z
@@ -39,11 +41,19 @@ const JoinChatRoomsForm = () => {
   };
 
   const { toast } = useToast();
+
   const navigate = useNavigate();
+
+  const setUser = useUserStore((state) => state.setUser);
+  const setMembers = useMembersStore((state) => state.setMembers);
 
   useEffect(() => {
     socket.on(EVENTS.SERVER.JOINED_CHAT_ROOMS, ({ members, user }) => {
       setIsLoading(false);
+
+      setMembers(members);
+      setUser(user);
+
       navigate("/chat-rooms", { replace: true });
     });
 
