@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import JoinChatRoomsForm from "@/components/JoinChatRoomsForm";
 
-function App() {
+function HomePage() {
   return (
     <div className="h-screen flex justify-center items-center">
       <Card className="max-w-[400px]">
@@ -25,4 +25,4 @@ function App() {
   );
 }
 
-export default App;
+export default HomePage;

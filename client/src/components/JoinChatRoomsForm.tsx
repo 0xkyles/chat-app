@@ -3,15 +3,17 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-import socket from "@/lib/sockets";
-import EVENTS from "@/lib/events";
+import socket from "@/sockets";
+import { EVENTS } from "@/sockets/events";
+import { useToast } from "@/components/ui/use-toast";
 
 const schema = z.object({
   username: z
-    .string({ required_error: "Username is required." })
+    .string()
     .trim()
     .min(2, { message: "Username must be at least 2 characters." })
     .max(10, { message: "Username must not exceed 10 characters." }),
@@ -21,6 +23,7 @@ type FormData = z.infer<typeof schema>;
 
 const JoinChatRoomsForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,20 +35,25 @@ const JoinChatRoomsForm = () => {
 
   const onSubmit = (data: FormData) => {
     setIsLoading(true);
-
     socket.emit(EVENTS.CLIENT.JOIN_CHAT_ROOMS, data);
   };
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
   useEffect(() => {
     socket.on(EVENTS.SERVER.JOINED_CHAT_ROOMS, ({ members, user }) => {
-      console.log(members);
       setIsLoading(false);
+      navigate("/chat-rooms", { replace: true });
     });
 
     socket.on(
       EVENTS.SERVER.USERNAME_TAKEN,
       ({ message }: { message: string }) => {
-        console.log(`Error ${message}`);
+        toast({
+          variant: "destructive",
+          description: message,
+        });
         setIsLoading(false);
       }
     );
@@ -83,7 +91,7 @@ const JoinChatRoomsForm = () => {
       </div>
 
       <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-        {isLoading ? <Loader className="animate-spin" /> : "Join"}
+        {isLoading ? <Loader className="animate-spin" /> : "Join chat rooms"}
       </Button>
     </form>
   );
