@@ -1,17 +1,7 @@
 import { Server, Socket } from "socket.io";
 import logger from "../utils/logger";
 import { User, addUser, getUsers, userExists } from "../data/users";
-
-const EVENTS = {
-  CONNECTION: "connection",
-  CLIENT: {
-    JOIN_CHAT_ROOMS: "join_chat_rooms",
-  },
-  SERVER: {
-    USERNAME_TAKEN: "username_taken",
-    JOINED_CHAT_ROOMS: "joined_chat_rooms",
-  },
-};
+import EVENTS from "./events";
 
 const setupSocket = (io: Server) => {
   io.on(EVENTS.CONNECTION, (socket: Socket) => {

@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
-import socket, { EVENTS } from "@/lib/sockets";
+import socket from "@/lib/sockets";
+import EVENTS from "@/lib/events";
 
 const schema = z.object({
   username: z
