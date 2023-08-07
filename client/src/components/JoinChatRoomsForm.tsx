@@ -3,15 +3,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader } from "lucide-react";
 import socket from "@/sockets";
 import { EVENTS } from "@/sockets/events";
-import { useToast } from "@/components/ui/use-toast";
-import useUserStore from "@/stores/userStore";
-import useMembersStore from "@/stores/membersStore";
+import useUserConnect from "@/hooks/useUserConnect";
 
 const schema = z.object({
   username: z
@@ -25,6 +22,7 @@ type FormData = z.infer<typeof schema>;
 
 const JoinChatRoomsForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  useUserConnect({ socket, setIsLoading });
 
   const {
     register,
@@ -39,40 +37,6 @@ const JoinChatRoomsForm = () => {
     setIsLoading(true);
     socket.emit(EVENTS.CLIENT.JOIN_CHAT_ROOMS, data);
   };
-
-  const { toast } = useToast();
-
-  const navigate = useNavigate();
-
-  const setUser = useUserStore((state) => state.setUser);
-  const setMembers = useMembersStore((state) => state.setMembers);
-
-  useEffect(() => {
-    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOMS, ({ members, user }) => {
-      setIsLoading(false);
-
-      setMembers(members);
-      setUser(user);
-
-      navigate("/chat-rooms", { replace: true });
-    });
-
-    socket.on(
-      EVENTS.SERVER.USERNAME_TAKEN,
-      ({ message }: { message: string }) => {
-        toast({
-          variant: "destructive",
-          description: message,
-        });
-        setIsLoading(false);
-      }
-    );
-
-    return () => {
-      socket.off(EVENTS.SERVER.USERNAME_TAKEN);
-      socket.off(EVENTS.SERVER.JOINED_CHAT_ROOMS);
-    };
-  }, []);
 
   return (
     <form
