@@ -6,6 +6,7 @@ import socket from "@/sockets";
 import { EVENTS } from "@/sockets";
 import { useToast } from "@/components/ui/use-toast";
 import { Notification } from "@/types";
+import { Button } from "@/components/ui/button";
 
 const ChatRoomsPage = () => {
   const user = useUserStore((state) => state.user);
@@ -34,13 +35,16 @@ const ChatRoomsPage = () => {
   }, []);
 
   return (
-    <div className="h-screen flex">
-      <div className="w-[200px] bg-red-500 p-4">
-        <h2 className="text-lg uppercase font-semibold mb-4">Chat rooms</h2>
-        <MembersList members={members} user={user} />
+    <div className="h-screen flex flex-col gap-4">
+      <div className="px-8 h-[60px] flex justify-between items-center border-b border-slate-300">
+        <h1 className="text-2xl font-semibold uppercase">Chatrooms</h1>
+        <Button>Create a room</Button>
       </div>
-      <div className="bg-blue-500 w-full p-4">
-        <h2 className="text-lg uppercase font-semibold">Messages</h2>
+      <div className="flex gap-4 h-full px-8 pb-2">
+        <div className="w-full border-2 rounded-md border-slate-200"></div>
+        <div className="w-[20vw]">
+          <MembersList members={members} user={user} />
+        </div>
       </div>
     </div>
   );

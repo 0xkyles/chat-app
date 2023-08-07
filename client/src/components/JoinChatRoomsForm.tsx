@@ -55,7 +55,7 @@ const JoinChatRoomsForm = () => {
           className="mt-1"
           type="username"
           id="username"
-          placeholder="Username..."
+          placeholder="johndoe"
         />
         {errors.username && (
           <p className="text-red-500 text-xs font-semibold mt-2">

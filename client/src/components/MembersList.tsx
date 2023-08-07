@@ -8,8 +8,8 @@ interface Props {
 const MembersList = ({ members, user }: Props) => {
   return (
     <div>
-      <p className="mb-4">Members</p>
-      <ul className="space-y-1">
+      <p className="font-semibold mb-2">Members</p>
+      <ul className="space-y-1 pl-3">
         {members.map((member) => (
           <li key={member.id} className="text-sm">
             {member.username}
