@@ -31,9 +31,15 @@ const setupSocket = (io: Server) => {
         };
         addUser(user);
 
+        const members = getUsers();
         socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOMS, {
-          members: getUsers(),
+          members,
           user,
+        });
+        socket.broadcast.emit(EVENTS.SERVER.UPDATE_MEMBERS, members);
+        socket.broadcast.emit(EVENTS.SERVER.NOTIFICATION, {
+          title: "New member arrived!",
+          message: `${username} joined the party!`,
         });
       }
     );
@@ -43,8 +49,12 @@ const setupSocket = (io: Server) => {
       if (!user) return;
 
       removeUser(socket.id);
-      socket.broadcast.emit(EVENTS.SERVER.USER_DISCONNECTED, {
-        members: getUsers(),
+
+      const members = getUsers();
+      socket.broadcast.emit(EVENTS.SERVER.UPDATE_MEMBERS, members);
+      socket.broadcast.emit(EVENTS.SERVER.NOTIFICATION, {
+        title: "Members departure!",
+        message: `${user.username} left the party!`,
       });
     });
   });
