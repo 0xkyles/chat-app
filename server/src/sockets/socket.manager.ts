@@ -9,6 +9,7 @@ import {
   userExists,
 } from "../data/users";
 import EVENTS from "./events";
+import { Room, addRoom, getRooms } from "../data/rooms";
 
 const setupSocket = (io: Server) => {
   io.on(EVENTS.CONNECTION, (socket: Socket) => {
@@ -32,17 +33,44 @@ const setupSocket = (io: Server) => {
         addUser(user);
 
         const members = getUsers();
+        const rooms = getRooms();
+
         socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOMS, {
           members,
           user,
+          rooms,
         });
         socket.broadcast.emit(EVENTS.SERVER.UPDATE_MEMBERS, members);
+        socket.broadcast.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
         socket.broadcast.emit(EVENTS.SERVER.NOTIFICATION, {
           title: "New member arrived!",
           message: `${username} joined the party!`,
         });
       }
     );
+
+    socket.on(EVENTS.CLIENT.CREATE_ROOM, ({ roomId }) => {
+      const users: User[] = [];
+      users.push(getUser(socket.id)!);
+
+      const room: Room = {
+        roomId,
+        users,
+      };
+
+      addRoom(room);
+
+      socket.join(roomId);
+
+      const rooms = getRooms();
+
+      socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
+      socket.emit(EVENTS.SERVER.NOTIFICATION, {
+        title: "Info",
+        message: "You joined the chat room!",
+      });
+      io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+    });
 
     socket.on(EVENTS.DISCONNECT, () => {
       const user = getUser(socket.id);

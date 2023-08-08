@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 import { EVENTS } from "@/sockets/events";
+import useRoomsStore from "@/stores/roomsStore";
 
 interface Props {
   socket: Socket;
@@ -18,13 +19,15 @@ const useUserConnect = ({ socket, setIsLoading }: Props) => {
 
   const setUser = useUserStore((state) => state.setUser);
   const setMembers = useMembersStore((state) => state.setMembers);
+  const setRooms = useRoomsStore((state) => state.setRooms);
 
   useEffect(() => {
-    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOMS, ({ members, user }) => {
+    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOMS, ({ members, user, rooms }) => {
       setIsLoading(false);
 
       setMembers(members);
       setUser(user);
+      setRooms(rooms);
 
       navigate("/chat-rooms", { replace: true });
     });

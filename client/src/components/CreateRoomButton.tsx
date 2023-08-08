@@ -6,16 +6,41 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import socket, { EVENTS } from "@/sockets";
+import { Loader } from "lucide-react";
 import { nanoid } from "nanoid";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import useRoomsStore, { Room } from "@/stores/roomsStore";
 
 const CreateRoomButton = () => {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const roomId = nanoid();
 
+  const createRoomHandler = () => {
+    setIsLoading(true);
+    socket.emit(EVENTS.CLIENT.CREATE_ROOM, { roomId });
+  };
+
+  const setRoom = useRoomsStore((state) => state.setRoom);
+
+  useEffect(() => {
+    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOM, ({ room }: { room: Room }) => {
+      setIsLoading(false);
+      setRoom(room);
+      setOpen(false);
+    });
+
+    return () => {
+      socket.off(EVENTS.SERVER.JOINED_CHAT_ROOM);
+    };
+  }, []);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>Create a room</Button>
       </DialogTrigger>
@@ -35,8 +60,13 @@ const CreateRoomButton = () => {
           />
         </div>
         <DialogFooter>
-          <Button className="w-full" type="submit">
-            Create room
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isLoading}
+            onClick={createRoomHandler}
+          >
+            {isLoading ? <Loader className="animate-spin" /> : "create room"}
           </Button>
         </DialogFooter>
       </DialogContent>
