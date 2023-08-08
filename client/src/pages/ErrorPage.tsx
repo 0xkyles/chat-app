@@ -10,9 +10,9 @@ const ErrorPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex justify-center items-center flex-col">
-      <h1>Uh-oh!</h1>
-      <p>
+    <div className="h-screen flex justify-center items-center flex-col">
+      <h1 className="text-5xl mb-1">Uh-oh!</h1>
+      <p className="text-sm mb-4">
         {isRouteErrorResponse(error)
           ? "We can't find that page."
           : "An unexpected error has occured."}
