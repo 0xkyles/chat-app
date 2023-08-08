@@ -4,6 +4,7 @@ export default {
   CLIENT: {
     JOIN_CHAT_ROOMS: "join_chat_rooms",
     CREATE_ROOM: "create_room",
+    LEAVE_ROOM: "leave_room",
   },
   SERVER: {
     USERNAME_TAKEN: "username_taken",
@@ -12,6 +13,7 @@ export default {
     UPDATE_MEMBERS: "update_members",
     UPDATE_ROOMS: "update_rooms",
     NOTIFICATION: "notification",
+    ROOM_LEFT: "room_left",
     USER_DISCONNECTED: "user_disconnected",
   },
 };

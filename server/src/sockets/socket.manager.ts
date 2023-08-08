@@ -9,7 +9,15 @@ import {
   userExists,
 } from "../data/users";
 import EVENTS from "./events";
-import { Room, addRoom, getRooms } from "../data/rooms";
+import {
+  Room,
+  addRoom,
+  getRoom,
+  getRooms,
+  kickUser,
+  removeRoom,
+  roomExists,
+} from "../data/rooms";
 
 const setupSocket = (io: Server) => {
   io.on(EVENTS.CONNECTION, (socket: Socket) => {
@@ -70,6 +78,34 @@ const setupSocket = (io: Server) => {
         message: "You joined the chat room!",
       });
       io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+    });
+
+    socket.on(EVENTS.CLIENT.LEAVE_ROOM, ({ roomId }) => {
+      const room = getRoom(roomId);
+      if (!room) return;
+
+      if (room.users.length == 1 && room.users[0].id == socket.id) {
+        removeRoom(roomId);
+
+        const rooms = getRooms();
+
+        socket.emit(EVENTS.SERVER.ROOM_LEFT);
+        socket.emit(EVENTS.SERVER.NOTIFICATION, {
+          title: "Info!",
+          message: `You left the room!`,
+        });
+        io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+      } else {
+        const user = getUser(socket.id);
+        kickUser(roomId, socket.id);
+
+        socket.to(roomId).emit(EVENTS.SERVER.NOTIFICATION, {
+          title: "Chat member departure!",
+          message: `${user?.username} left the chat!`,
+        });
+      }
+
+      socket.leave(roomId);
     });
 
     socket.on(EVENTS.DISCONNECT, () => {

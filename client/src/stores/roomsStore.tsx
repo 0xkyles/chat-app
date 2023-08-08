@@ -6,14 +6,14 @@ export interface Room {
   users: User[];
 }
 
-interface roomState {
+interface RoomState {
   room: Room | null;
   rooms: Room[];
-  setRoom: (room: Room) => void;
+  setRoom: (room: Room | null) => void;
   setRooms: (rooms: Room[]) => void;
 }
 
-const useRoomsStore = create<roomState>((set) => ({
+const useRoomsStore = create<RoomState>((set) => ({
   room: null,
   rooms: [],
   setRoom: (room) => set({ room }),
