@@ -22,7 +22,9 @@ const CreateRoomButton = () => {
 
   const createRoomHandler = () => {
     setIsLoading(true);
-    socket.emit(EVENTS.CLIENT.CREATE_ROOM, { roomId });
+    setTimeout(() => {
+      socket.emit(EVENTS.CLIENT.CREATE_ROOM, { roomId });
+    }, 500);
   };
 
   const setRoom = useRoomsStore((state) => state.setRoom);

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -72,7 +73,7 @@
 @layer base {
   * {
     @apply border-border;
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-family: "Open sans", system-ui, sans-serif;
   }
   body {
     @apply bg-background text-foreground;

@@ -35,7 +35,9 @@ const JoinChatRoomsForm = () => {
 
   const onSubmit = (data: FormData) => {
     setIsLoading(true);
-    socket.emit(EVENTS.CLIENT.JOIN_CHAT_ROOMS, data);
+    setTimeout(() => {
+      socket.emit(EVENTS.CLIENT.JOIN_CHAT_ROOMS, data);
+    }, 500);
   };
 
   return (
