@@ -17,6 +17,10 @@ import {
   kickUser,
   removeRoom,
 } from "../data/rooms";
+import updateRooms from "./helpers/updateRooms";
+import joinRoom from "./helpers/joinRoom";
+import leaveRoom from "./helpers/leaveRoom";
+import updateMembers from "./helpers/updateMembers";
 
 const setupSocket = (io: Server) => {
   io.on(EVENTS.CONNECTION, (socket: Socket) => {
@@ -47,8 +51,10 @@ const setupSocket = (io: Server) => {
           user,
           rooms,
         });
-        socket.broadcast.emit(EVENTS.SERVER.UPDATE_MEMBERS, members);
-        socket.broadcast.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+
+        updateMembers(socket);
+        updateRooms(io);
+
         socket.broadcast.emit(EVENTS.SERVER.NOTIFICATION, {
           title: "New member arrived!",
           message: `${username} joined the party!`,
@@ -66,27 +72,16 @@ const setupSocket = (io: Server) => {
       };
       addRoom(room);
 
-      socket.join(roomId);
-      socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
-      socket.emit(EVENTS.SERVER.NOTIFICATION, {
-        title: "Info",
-        message: "You joined the chat room!",
-      });
+      joinRoom(socket, roomId, room);
 
-      const rooms = getRooms();
-      io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+      updateRooms(io);
     });
 
     socket.on(EVENTS.CLIENT.JOIN_ROOM, ({ roomId }) => {
       const room = getRoom(roomId);
       if (!room) return;
 
-      socket.join(roomId);
-      socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
-      socket.emit(EVENTS.SERVER.NOTIFICATION, {
-        title: "Info",
-        message: "You joined the chat room!",
-      });
+      joinRoom(socket, roomId, room);
 
       const user = getUser(socket.id);
       socket.to(roomId).emit(EVENTS.SERVER.NOTIFICATION, {
@@ -101,10 +96,7 @@ const setupSocket = (io: Server) => {
 
       if (room.users.length == 1 && room.users[0].id == socket.id) {
         removeRoom(roomId);
-
-        const rooms = getRooms();
-
-        io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+        updateRooms(io);
       } else {
         kickUser(roomId, socket.id);
 
@@ -116,12 +108,7 @@ const setupSocket = (io: Server) => {
         });
       }
 
-      socket.emit(EVENTS.SERVER.NOTIFICATION, {
-        title: "Info!",
-        message: `You left the room!`,
-      });
-      socket.emit(EVENTS.SERVER.ROOM_LEFT);
-      socket.leave(roomId);
+      leaveRoom(socket, roomId);
     });
 
     socket.on(EVENTS.DISCONNECT, () => {
@@ -129,9 +116,8 @@ const setupSocket = (io: Server) => {
       if (!user) return;
 
       removeUser(socket.id);
+      updateMembers(socket);
 
-      const members = getUsers();
-      socket.broadcast.emit(EVENTS.SERVER.UPDATE_MEMBERS, members);
       socket.broadcast.emit(EVENTS.SERVER.NOTIFICATION, {
         title: "Members departure!",
         message: `${user.username} left the party!`,
