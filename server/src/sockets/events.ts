@@ -5,6 +5,7 @@ export default {
     JOIN_CHAT_ROOMS: "join_chat_rooms",
     CREATE_ROOM: "create_room",
     LEAVE_ROOM: "leave_room",
+    JOIN_ROOM: "join_room",
   },
   SERVER: {
     USERNAME_TAKEN: "username_taken",

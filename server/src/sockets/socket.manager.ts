@@ -16,7 +16,6 @@ import {
   getRooms,
   kickUser,
   removeRoom,
-  roomExists,
 } from "../data/rooms";
 
 const setupSocket = (io: Server) => {
@@ -65,19 +64,35 @@ const setupSocket = (io: Server) => {
         roomId,
         users,
       };
-
       addRoom(room);
 
       socket.join(roomId);
-
-      const rooms = getRooms();
-
       socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
       socket.emit(EVENTS.SERVER.NOTIFICATION, {
         title: "Info",
         message: "You joined the chat room!",
       });
+
+      const rooms = getRooms();
       io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
+    });
+
+    socket.on(EVENTS.CLIENT.JOIN_ROOM, ({ roomId }) => {
+      const room = getRoom(roomId);
+      if (!room) return;
+
+      socket.join(roomId);
+      socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
+      socket.emit(EVENTS.SERVER.NOTIFICATION, {
+        title: "Info",
+        message: "You joined the chat room!",
+      });
+
+      const user = getUser(socket.id);
+      socket.to(roomId).emit(EVENTS.SERVER.NOTIFICATION, {
+        title: "Chat member arrival!",
+        message: `${user?.username} joined the chat room!`,
+      });
     });
 
     socket.on(EVENTS.CLIENT.LEAVE_ROOM, ({ roomId }) => {
@@ -89,15 +104,11 @@ const setupSocket = (io: Server) => {
 
         const rooms = getRooms();
 
-        socket.emit(EVENTS.SERVER.ROOM_LEFT);
-        socket.emit(EVENTS.SERVER.NOTIFICATION, {
-          title: "Info!",
-          message: `You left the room!`,
-        });
         io.emit(EVENTS.SERVER.UPDATE_ROOMS, rooms);
       } else {
-        const user = getUser(socket.id);
         kickUser(roomId, socket.id);
+
+        const user = getUser(socket.id);
 
         socket.to(roomId).emit(EVENTS.SERVER.NOTIFICATION, {
           title: "Chat member departure!",
@@ -105,6 +116,11 @@ const setupSocket = (io: Server) => {
         });
       }
 
+      socket.emit(EVENTS.SERVER.NOTIFICATION, {
+        title: "Info!",
+        message: `You left the room!`,
+      });
+      socket.emit(EVENTS.SERVER.ROOM_LEFT);
       socket.leave(roomId);
     });
 

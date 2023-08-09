@@ -2,28 +2,35 @@ import useRoomsStore, { Room } from "@/stores/roomsStore";
 import { useEffect } from "react";
 import socket from "@/sockets";
 import { EVENTS } from "@/sockets";
+import { Button } from "@/components/ui/button";
 
 const RoomsList = () => {
   const rooms = useRoomsStore((state) => state.rooms);
   const setRooms = useRoomsStore((state) => state.setRooms);
+
+  const joinRoomHandler = (roomId: string) => {
+    socket.emit(EVENTS.CLIENT.JOIN_ROOM, { roomId });
+  };
+
+  const setRoom = useRoomsStore((state) => state.setRoom);
 
   useEffect(() => {
     socket.on(EVENTS.SERVER.UPDATE_ROOMS, (rooms: Room[]) => {
       setRooms(rooms);
     });
 
-    // socket.on(
-    //   EVENTS.SERVER.NOTIFICATION,
-    //   ({ message, title }: Notification) => {
-    //     toast({
-    //       title,
-    //       description: message,
-    //     });
-    //   }
-    // );
-
     return () => {
       socket.off(EVENTS.SERVER.UPDATE_ROOMS);
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOM, ({ room }: { room: Room }) => {
+      setRoom(room);
+    });
+
+    return () => {
+      socket.off(EVENTS.SERVER.JOINED_CHAT_ROOM);
     };
   }, []);
 
@@ -33,9 +40,14 @@ const RoomsList = () => {
 
       <ul className="space-y-1 pl-3">
         {rooms.map((room) => (
-          <li key={room.roomId} className="text-sm">
+          <Button
+            onClick={() => joinRoomHandler(room.roomId)}
+            variant="link"
+            key={room.roomId}
+            className="text-sm text-left whitespace-nowrap"
+          >
             {room.roomId}
-          </li>
+          </Button>
         ))}
       </ul>
     </>
