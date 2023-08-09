@@ -1,8 +1,8 @@
+import { Button } from "@/components/ui/button";
+import useJoinChatRoom from "@/hooks/useJoinChatRoom";
+import socket, { EVENTS } from "@/sockets";
 import useRoomsStore, { Room } from "@/stores/roomsStore";
 import { useEffect } from "react";
-import socket from "@/sockets";
-import { EVENTS } from "@/sockets";
-import { Button } from "@/components/ui/button";
 
 const RoomsList = () => {
   const rooms = useRoomsStore((state) => state.rooms);
@@ -11,8 +11,6 @@ const RoomsList = () => {
   const joinRoomHandler = (roomId: string) => {
     socket.emit(EVENTS.CLIENT.JOIN_ROOM, { roomId });
   };
-
-  const setRoom = useRoomsStore((state) => state.setRoom);
 
   useEffect(() => {
     socket.on(EVENTS.SERVER.UPDATE_ROOMS, (rooms: Room[]) => {
@@ -24,15 +22,7 @@ const RoomsList = () => {
     };
   }, []);
 
-  useEffect(() => {
-    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOM, ({ room }: { room: Room }) => {
-      setRoom(room);
-    });
-
-    return () => {
-      socket.off(EVENTS.SERVER.JOINED_CHAT_ROOM);
-    };
-  }, []);
+  useJoinChatRoom();
 
   return (
     <>

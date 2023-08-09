@@ -6,14 +6,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useJoinChatRoom from "@/hooks/useJoinChatRoom";
 import socket, { EVENTS } from "@/sockets";
 import { Loader } from "lucide-react";
 import { nanoid } from "nanoid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import useRoomsStore, { Room } from "@/stores/roomsStore";
 
 const CreateRoomButton = () => {
   const [open, setOpen] = useState(false);
@@ -27,19 +27,10 @@ const CreateRoomButton = () => {
     }, 500);
   };
 
-  const setRoom = useRoomsStore((state) => state.setRoom);
-
-  useEffect(() => {
-    socket.on(EVENTS.SERVER.JOINED_CHAT_ROOM, ({ room }: { room: Room }) => {
-      setIsLoading(false);
-      setRoom(room);
-      setOpen(false);
-    });
-
-    return () => {
-      socket.off(EVENTS.SERVER.JOINED_CHAT_ROOM);
-    };
-  }, []);
+  useJoinChatRoom(() => {
+    setIsLoading(false);
+    setOpen(false);
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
