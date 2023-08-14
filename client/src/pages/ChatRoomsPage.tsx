@@ -4,6 +4,7 @@ import CreateRoomButton from "@/components/CreateRoomButton";
 import RoomsList from "@/components/RoomsList";
 import useRoomsStore from "@/stores/roomsStore";
 import LeaveRoomButton from "@/components/LeaveRoomButton";
+import ChatMembersList from "@/components/ChatMembersList";
 
 const ChatRoomsPage = () => {
   const room = useRoomsStore((state) => state.room);
@@ -21,12 +22,21 @@ const ChatRoomsPage = () => {
         <ChatZone />
 
         <div className="w-[20vw]">
-          <div className="h-1/2">
-            <MembersList />
-          </div>
-          <div className="h-1/2">
-            <RoomsList />
-          </div>
+          {room && (
+            <div>
+              <ChatMembersList />
+            </div>
+          )}
+          {!room && (
+            <>
+              <div className="h-1/2">
+                <MembersList />
+              </div>
+              <div className="h-1/2">
+                <RoomsList />
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

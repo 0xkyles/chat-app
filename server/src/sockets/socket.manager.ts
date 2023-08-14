@@ -70,10 +70,9 @@ const setupSocket = (io: Server) => {
         roomId,
         users,
       };
+
       addRoom(room);
-
       joinRoom(socket, roomId, room);
-
       updateRooms(io);
     });
 
@@ -94,7 +93,8 @@ const setupSocket = (io: Server) => {
       const room = getRoom(roomId);
       if (!room) return;
 
-      if (room.users.length == 1 && room.users[0].id == socket.id) {
+      leaveRoom(socket, roomId);
+      if (room.users.length == 1) {
         removeRoom(roomId);
         updateRooms(io);
       } else {
@@ -107,8 +107,6 @@ const setupSocket = (io: Server) => {
           message: `${user?.username} left the chat!`,
         });
       }
-
-      leaveRoom(socket, roomId);
     });
 
     socket.on(EVENTS.DISCONNECT, () => {

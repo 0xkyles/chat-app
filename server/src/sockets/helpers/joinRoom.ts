@@ -4,6 +4,7 @@ import EVENTS from "../events";
 
 const joinRoom = (socket: Socket, roomId: string, room: Room) => {
   socket.join(roomId);
+
   socket.emit(EVENTS.SERVER.JOINED_CHAT_ROOM, { room });
   socket.emit(EVENTS.SERVER.NOTIFICATION, {
     title: "Info",

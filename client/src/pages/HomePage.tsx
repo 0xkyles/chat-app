@@ -14,7 +14,7 @@ function HomePage() {
         <CardHeader>
           <CardTitle className="mb-1">Chat rooms</CardTitle>
           <CardDescription>
-            Access real-time messaging app & start chatting with your friend.
+            Access real-time messaging app & start chatting with your friends.
           </CardDescription>
         </CardHeader>
         <CardContent>
